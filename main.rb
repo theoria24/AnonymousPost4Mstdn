@@ -34,7 +34,7 @@ begin
             open(ml.id, "wb") {|mid|
               open(ml.url) {|mu|
                 mid.write(mu.read)
-                p "saved: #{mid}"
+                p "saved: #{ml.id}"
               }
             }
           }
