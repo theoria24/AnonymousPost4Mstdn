@@ -29,7 +29,7 @@ begin
           content.gsub!(Regexp.new("@#{account}", Regexp::IGNORECASE), "")
           p toot.status.attributes["spoiler_text"] if debug
           p content if debug
-          rest.create_status(content, spoiler_text:toot.status.spoiler_text)
+          rest.create_status(content, spoiler_text:toot.status.attributes["spoiler_text"])
         end
       end
     end
