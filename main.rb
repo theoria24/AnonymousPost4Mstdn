@@ -43,7 +43,7 @@ begin
             uml << rest.upload_media(u).id
             p "uploaded: #{u}"
           }
-          content = "※本文なし" if content.empty?
+          content = "※本文なし" if content.empty? && !(uml.empty?)
           p "spoiler text: #{toot.status.attributes["spoiler_text"]}" if debug
           p "content: #{content}" if debug
           p "media: #{uml}" if debug
