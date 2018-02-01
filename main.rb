@@ -23,7 +23,7 @@ begin
         content = toot.status.content
         content.gsub!(/<br\s?\/?>/, "\n")
         content.gsub!("</p><p>", "\n\n")
-        content = Sanitize.clean(content)
+        content = Sanitize.clean(content).strip
         p "@#{toot.status.account.acct}: #{content}" if debug
         if toot.status.visibility == "direct" then
           content.gsub!(Regexp.new("@#{account}", Regexp::IGNORECASE), "")
@@ -43,6 +43,7 @@ begin
             uml << rest.upload_media(u).id
             p "uploaded: #{u}"
           }
+          content = "※本文なし" if content.empty?
           p "spoiler text: #{toot.status.attributes["spoiler_text"]}" if debug
           p "content: #{content}" if debug
           p "media: #{uml}" if debug
