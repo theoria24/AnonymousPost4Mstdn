@@ -48,7 +48,7 @@ begin
             n_imgt << media.attributes["text_url"]
             p "uploaded: #{u}"
           }
-          if !(toot.status.media_attachments == []) then
+          if !(toot.status.media_attachments == []) && !(o_imgt.include?(nil)) then
             imgt = [o_imgt, n_imgt].transpose
             imgt = Hash[*imgt.flatten]
             content = content.gsub(Regexp.union(o_imgt), imgt)
