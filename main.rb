@@ -14,7 +14,7 @@ rest = Mastodon::REST::Client.new(
   base_url: "https://" + config["base_url"],
   bearer_token: config["access_token"])
 
-account = config["account"]
+account = rest.verify_credentials().acct
 
 begin
   stream.user() do |toot|
