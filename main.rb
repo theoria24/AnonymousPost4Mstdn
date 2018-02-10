@@ -2,6 +2,7 @@ require 'bundler/setup'
 require 'yaml'
 require 'mastodon'
 require 'sanitize'
+require 'open-uri'
 
 config = YAML.load_file("./key.yml")
 debug = false
