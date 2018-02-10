@@ -29,8 +29,10 @@ begin
           content.gsub!(Regexp.new("@#{account}", Regexp::IGNORECASE), "")
           p "画像あり" if !(toot.status.media_attachments == [])
           imgs = []
+          o_imgt = []
           toot.status.media_attachments.each {|ml|
             imgs << ml.id
+            o_imgt << ml.text_url
             open(ml.id, "wb") {|mid|
               open(ml.url) {|mu|
                 mid.write(mu.read)
@@ -39,10 +41,18 @@ begin
             }
           }
           uml = []
+          n_imgt = []
           imgs.each {|u|
-            uml << rest.upload_media(u).id
+            media = rest.upload_media(u)
+            uml << media.id
+            n_imgt << media.text_url
             p "uploaded: #{u}"
           }
+          if !(toot.status.media_attachments == []) then
+            imgt = [o_imgt, n_imgt].transpose
+            imgt = Hash[*imgt.flatten]
+            content = content.gsub(Regexp.union(o_imgt), imgt)
+          end
           content = 0x200B.chr("UTF-8") if content.empty? && !(uml.empty?)
           p "spoiler text: #{toot.status.attributes["spoiler_text"]}" if debug
           p "content: #{content}" if debug
