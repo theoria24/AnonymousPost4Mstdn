@@ -67,7 +67,7 @@ begin
         end
       elsif toot.type == "follow" then
         rest.follow(toot.account.id)
-        p "follow: #{toot.acct}" if debug
+        p "follow: #{toot.account.acct}" if debug
       end
     end
   end
