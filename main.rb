@@ -28,16 +28,17 @@ begin
         p "@#{toot.status.account.acct}: #{content}" if debug
         if toot.status.visibility == "direct" then
           content.gsub!(Regexp.new("@#{account}", Regexp::IGNORECASE), "")
-          p "画像あり" if !(toot.status.media_attachments == [])
+          p "画像あり" if !(toot.status.media_attachments == []) && debug
           imgs = []
           o_imgt = []
           toot.status.media_attachments.each {|ml|
             imgs << ml.id
+            p ml.attributes["text_url"] if debug
             o_imgt << ml.attributes["text_url"]
             open(ml.id, "wb") {|mid|
               open(ml.url) {|mu|
                 mid.write(mu.read)
-                p "saved: #{ml.id}"
+                p "saved: #{ml.id}" if debug
               }
             }
           }
@@ -47,11 +48,14 @@ begin
             media = rest.upload_media(u)
             uml << media.id
             n_imgt << media.attributes["text_url"]
-            p "uploaded: #{u}"
+            p "uploaded: #{u}" if debug
           }
+          p o_imgt if debug
+          p n_imgt if debug
           if !(toot.status.media_attachments == []) && !(o_imgt.include?(nil)) then
             imgt = [o_imgt, n_imgt].transpose
             imgt = Hash[*imgt.flatten]
+            p imgt if debug
             content = content.gsub(Regexp.union(o_imgt), imgt)
           end
           content = 0x200B.chr("UTF-8") if content.empty? && !(uml.empty?)
@@ -61,6 +65,9 @@ begin
           p "sensitive?: #{toot.status.attributes["sensitive"]}" if debug
           rest.create_status(content, sensitive: toot.status.attributes["sensitive"], spoiler_text: toot.status.attributes["spoiler_text"], media_ids: uml)
         end
+      elsif toot.type == "follow" then
+        rest.follow(toot.account.id)
+        p "follow: #{toot.acct}" if debug
       end
     end
   end
