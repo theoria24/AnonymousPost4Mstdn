@@ -14,8 +14,8 @@ GEM
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
     buftok (0.2.0)
-    crass (1.0.3)
-    domain_name (0.5.20170404)
+    crass (1.0.4)
+    domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
     http (2.2.2)
       addressable (~> 2.3)
@@ -31,14 +31,14 @@ GEM
       mini_portile2 (~> 2.3.0)
     nokogumbo (1.5.0)
       nokogiri
-    public_suffix (3.0.1)
-    sanitize (4.6.0)
+    public_suffix (3.0.2)
+    sanitize (4.6.5)
       crass (~> 1.0.2)
       nokogiri (>= 1.4.4)
       nokogumbo (~> 1.4)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.4)
+    unf_ext (0.0.7.5)
 
 PLATFORMS
   ruby
