@@ -27,43 +27,63 @@ begin
         content = Sanitize.clean(content).strip
         p "@#{toot.status.account.acct}: #{content}" if debug
         if toot.status.visibility == "direct" then
-          content.gsub!(Regexp.new("^@#{account}", Regexp::IGNORECASE), "")
-          p "media_attachments: #{toot.status.media_attachments}" if debug
-          imgs = []
-          o_imgt = []
-          toot.status.media_attachments.each {|ml|
-            imgs << ml.id
-            p ml.attributes["text_url"] if debug
-            o_imgt << ml.attributes["text_url"]
-            open(ml.id, "wb") {|mid|
-              open(ml.url) {|mu|
-                mid.write(mu.read)
-                p "saved: #{ml.id}" if debug
+          if content.start_with?(Regexp.new("^@#{account}\sbt", Regexp::IGNORECASE)) then
+            uris = content.gsub(Regexp.new("^@#{account}\sbt", Regexp::IGNORECASE), "").split(" ")
+            uris.each {|uri|
+              result = rest.search(uri).attributes["statuses"][0]
+              if !result.nil? then
+                if result["visibility"] != "private" then
+                  rest.reblog(result["id"])
+                end
+              end
+            }
+          elsif content.start_with?(Regexp.new("^@#{account}\sfav", Regexp::IGNORECASE)) then
+            uris = content.gsub(Regexp.new("^@#{account}\sfav", Regexp::IGNORECASE), "").split(" ")
+            uris.each {|uri|
+              result = rest.search(uri).attributes["statuses"][0]
+              if !result.nil? then
+                rest.favourite(result["id"])
+              end
+            }
+          else
+            content.gsub!(Regexp.new("^@#{account}", Regexp::IGNORECASE), "")
+            p "media_attachments: #{toot.status.media_attachments}" if debug
+            imgs = []
+            o_imgt = []
+            toot.status.media_attachments.each {|ml|
+              imgs << ml.id
+              p ml.attributes["text_url"] if debug
+              o_imgt << ml.attributes["text_url"]
+              open(ml.id, "wb") {|mid|
+                open(ml.url) {|mu|
+                  mid.write(mu.read)
+                  p "saved: #{ml.id}" if debug
+                }
               }
             }
-          }
-          uml = []
-          n_imgt = []
-          imgs.each {|u|
-            media = rest.upload_media(u)
-            uml << media.id
-            n_imgt << media.attributes["text_url"]
-            p "uploaded: #{u}" if debug
-          }
-          p o_imgt if debug
-          p n_imgt if debug
-          if !(toot.status.media_attachments == []) && !(o_imgt.include?(nil)) then
-            imgt = [o_imgt, n_imgt].transpose
-            imgt = Hash[*imgt.flatten]
-            p imgt if debug
-            content = content.gsub(Regexp.union(o_imgt), imgt)
+            uml = []
+            n_imgt = []
+            imgs.each {|u|
+              media = rest.upload_media(u)
+              uml << media.id
+              n_imgt << media.attributes["text_url"]
+              p "uploaded: #{u}" if debug
+            }
+            p o_imgt if debug
+            p n_imgt if debug
+            if !(toot.status.media_attachments == []) && !(o_imgt.include?(nil)) then
+              imgt = [o_imgt, n_imgt].transpose
+              imgt = Hash[*imgt.flatten]
+              p imgt if debug
+              content = content.gsub(Regexp.union(o_imgt), imgt)
+            end
+            content = 0x200B.chr("UTF-8") if content.empty? && !(uml.empty?)
+            p "spoiler text: #{toot.status.attributes["spoiler_text"]}" if debug
+            p "content: #{content}" if debug
+            p "media: #{uml}" if debug
+            p "sensitive?: #{toot.status.attributes["sensitive"]}" if debug
+            rest.create_status(content, sensitive: toot.status.attributes["sensitive"], spoiler_text: toot.status.attributes["spoiler_text"], media_ids: uml)
           end
-          content = 0x200B.chr("UTF-8") if content.empty? && !(uml.empty?)
-          p "spoiler text: #{toot.status.attributes["spoiler_text"]}" if debug
-          p "content: #{content}" if debug
-          p "media: #{uml}" if debug
-          p "sensitive?: #{toot.status.attributes["sensitive"]}" if debug
-          rest.create_status(content, sensitive: toot.status.attributes["sensitive"], spoiler_text: toot.status.attributes["spoiler_text"], media_ids: uml)
         end
       elsif toot.type == "follow" then
         rest.follow(toot.account.id)
