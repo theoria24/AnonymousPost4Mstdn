@@ -31,7 +31,7 @@ begin
             uris = content.gsub(Regexp.new("^@#{account}\sbt", Regexp::IGNORECASE), "").split(" ")
             uris.each {|uri|
               result = rest.search(uri).attributes["statuses"][0]
-              if result.present? then
+              if !result.nil? then
                 if result["visibility"] != "private" then
                   rest.reblog(result["id"])
                 end
@@ -41,7 +41,7 @@ begin
             uris = content.gsub(Regexp.new("^@#{account}\sfav", Regexp::IGNORECASE), "").split(" ")
             uris.each {|uri|
               result = rest.search(uri).attributes["statuses"][0]
-              if result.present? then
+              if !result.nil? then
                 rest.favourite(result["id"])
               end
             }
