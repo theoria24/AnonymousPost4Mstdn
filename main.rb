@@ -32,7 +32,7 @@ begin
             uris.each {|uri|
               result = rest.search(uri).attributes["statuses"][0]
               if result.present? then
-                if result["visibility"] !== "private" then
+                if result["visibility"] != "private" then
                   rest.reblog(result["id"])
                 end
               end
