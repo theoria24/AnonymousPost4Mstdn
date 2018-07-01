@@ -27,8 +27,8 @@ begin
         content = Sanitize.clean(content).strip
         p "@#{toot.status.account.acct}: #{content}" if debug
         if toot.status.visibility == "direct" then
-          if content.start_with?(Regexp.new("^@#{account}\sbt", Regexp::IGNORECASE)) then
-            uris = content.gsub(Regexp.new("^@#{account}\sbt", Regexp::IGNORECASE), "").split(" ")
+          if content.start_with?(Regexp.new("^@#{account}\s+bt\s", Regexp::IGNORECASE)) then
+            uris = content.gsub(Regexp.new("^@#{account}\s+bt\s", Regexp::IGNORECASE), "").split(" ")
             uris.each {|uri|
               result = rest.search(uri).attributes["statuses"][0]
               if !result.nil? then
@@ -37,8 +37,8 @@ begin
                 end
               end
             }
-          elsif content.start_with?(Regexp.new("^@#{account}\sfav", Regexp::IGNORECASE)) then
-            uris = content.gsub(Regexp.new("^@#{account}\sfav", Regexp::IGNORECASE), "").split(" ")
+          elsif content.start_with?(Regexp.new("^@#{account}\s+fav\s", Regexp::IGNORECASE)) then
+            uris = content.gsub(Regexp.new("^@#{account}\s+fav\s", Regexp::IGNORECASE), "").split(" ")
             uris.each {|uri|
               result = rest.search(uri).attributes["statuses"][0]
               if !result.nil? then
