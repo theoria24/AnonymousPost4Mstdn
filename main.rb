@@ -85,7 +85,7 @@ begin
             p "content: #{content}" if debug
             p "media: #{uml}" if debug
             p "sensitive?: #{toot.status.attributes["sensitive"]}" if debug
-            rest.create_status(content, sensitive: toot.status.attributes["sensitive"], spoiler_text: toot.status.attributes["spoiler_text"], media_ids: uml)
+            rest.create_status(content, in_reply_to_id: toot.status.attributes["in_reply_to_id"], sensitive: toot.status.attributes["sensitive"], spoiler_text: toot.status.attributes["spoiler_text"], media_ids: uml)
             log = {time: toot.status.attributes["created_at"], id: toot.status.attributes["id"], in_reply_to_id: toot.status.attributes["in_reply_to_id"], acct: toot.status.account.acct, content: toot.status.content} # とっておくべきはこのへんかなぁ
             begin
               Timeout.timeout(5) do
