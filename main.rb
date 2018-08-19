@@ -3,8 +3,11 @@ require 'yaml'
 require 'mastodon'
 require 'sanitize'
 require 'open-uri'
+require 'google_drive'
 
-config = YAML.load_file("./key.yml")
+config = YAML.load_file("key.yml")
+gd = GoogleDrive::Session.from_config("config.json")
+ws = gd.spreadsheet_by_key(config["ss_key"]).worksheets[0]
 debug = false
 
 stream = Mastodon::Streaming::Client.new(
@@ -83,6 +86,19 @@ begin
             p "media: #{uml}" if debug
             p "sensitive?: #{toot.status.attributes["sensitive"]}" if debug
             rest.create_status(content, sensitive: toot.status.attributes["sensitive"], spoiler_text: toot.status.attributes["spoiler_text"], media_ids: uml)
+            log = {time: toot.status.attributes["created_at"], id: toot.status.attributes["id"], in_reply_to_id: toot.status.attributes["in_reply_to_id"], acct: toot.status.account.acct, content: toot.status.content} # とっておくべきはこのへんかなぁ
+            begin
+              Timeout.timeout(5) do
+                ws.list.push(
+                  hash["log"].each do |k, v|
+                    ["#{k}" => "#{v}"]
+                  end
+                )
+                ws.save
+              end
+            rescue Timeout::Error
+              puts "Google SpreadSheet-- Timed out while attempting to send"
+            end
           end
         end
       elsif toot.type == "follow" then

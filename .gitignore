@@ -102,3 +102,4 @@ build-iPhoneSimulator/
 # End of https://www.gitignore.io/api/git,osx,ruby,linux
 
 key.yml
+config.json
